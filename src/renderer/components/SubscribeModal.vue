@@ -32,7 +32,7 @@
         </b-input-group>
       </form>
       <div v-if="feeddata !== null" class="subscription-content col pt-3">
-        <template v-for="(feed, index) in feeddata.feedUrls">
+        <template v-for="(feed) in feeddata.feedUrls">
           <b-input-group size="md">
             <b-input-group-text slot="append">
               <b-form-checkbox v-model="selected_feed" :value="feed"></b-form-checkbox>
@@ -96,7 +96,9 @@ export default {
       this.showAddCat = !this.showAddCat
     },
     async isContentXML (link) {
-      const content = await axios.get(link)
+      const user = this.$store.state.Setting.auth || ''
+      const pass = this.$store.state.Setting.pass || ''
+      const content = await axios.get(link, { auth: { username: user, password: pass } })
       return content.headers['content-type'] === 'application/xml'
     },
     async fetchFeed () {

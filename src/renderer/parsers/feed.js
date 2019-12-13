@@ -1,14 +1,17 @@
 import he from 'he'
-import got from 'got'
+// import got from 'got'
+import axios from 'axios'
 import FeedParser from 'feedparser'
-import RssParser from 'rss-parser'
+// import RssParser from 'rss-parser'
+import Store from 'electron-store'
 
-const parser = new RssParser({
-  defaultRSS: 2.0,
-  headers: {
-    'User-Agent': 'Raven Reader'
-  }
-})
+const store = new Store()
+// const parser = new RssParser({
+//   defaultRSS: 2.0,
+//   headers: {
+//     'User-Agent': 'Raven Reader'
+//   }
+// })
 
 /**
  * Parse feed
@@ -16,17 +19,27 @@ const parser = new RssParser({
  * @return array
  */
 export async function parseFeed (feedUrl, faviconUrl = null) {
-  let feed
+  // let feed
   const feeditem = {
     meta: '',
     posts: []
   }
-  try {
-    feed = await parser.parseURL(feedUrl)
-  } catch (e) {
-    const stream = await got.stream(feedUrl, { retries: 0 })
-    feed = await parseFeedParser(stream)
-  }
+  // try {
+  //   feed = await parser.parseURL(feedUrl)
+  // } catch (e) {
+  // const stream = await got.stream(feedUrl, { retries: 0 })
+  const auth = store.get('settings.auth') || {}
+  const stream = await axios.get(feedUrl,
+    {
+      auth: {
+        username: auth.user || '',
+        password: auth.pass || ''
+      },
+      responseType: 'stream'
+    })
+  // feed = await parseFeedParser(stream)
+  // }
+  const feed = await parseFeedParser(stream.data)
 
   feeditem.meta = {
     link: feed.link,
@@ -85,3 +98,5 @@ export function ParseFeedPost (feed) {
   })
   return feed
 }
+
+parseFeed('https://news.yahoo.co.jp/pickup/rss.xml')
