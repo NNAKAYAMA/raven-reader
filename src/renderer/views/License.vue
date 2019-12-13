@@ -52,27 +52,28 @@ export default {
   methods: {
     async checkLicenseKey () {
       const licenseKey = this.$electronstore.get('license_key')
-      if (licenseKey === TEST_LICENSE_KEY) {
-        this.$electronstore.set('license_key', licenseKey)
-        this.$router.push('/')
-      } else {
-        try {
-          const checkLicenseKey = await axios.get(`${API_DOMAIN}/license/verify?license_key=${licenseKey}`)
-          if (checkLicenseKey.data.data.success) {
-            var subscribedAt = dayjs(checkLicenseKey.data.data.purchase.created_at)
-            var expiresAt = dayjs(checkLicenseKey.data.data.purchase.created_at).add(1, 'year')
-            var days = expiresAt.diff(subscribedAt, 'day')
-            this.licenseKeyExpiring = days > 0 && days <= 30
-            this.licenseKeyExpired = days === 0
-            this.loading = false
-            this.$router.push('/')
-          } else {
-            this.loading = false
-          }
-        } catch (e) {
-          this.loading = false
-        }
-      }
+      // if (true) {
+      // if (licenseKey === TEST_LICENSE_KEY) {
+      this.$electronstore.set('license_key', licenseKey)
+      this.$router.push('/')
+      // } else {
+      //   try {
+      //     const checkLicenseKey = await axios.get(`${API_DOMAIN}/license/verify?license_key=${licenseKey}`)
+      //     if (checkLicenseKey.data.data.success) {
+      //       var subscribedAt = dayjs(checkLicenseKey.data.data.purchase.created_at)
+      //       var expiresAt = dayjs(checkLicenseKey.data.data.purchase.created_at).add(1, 'year')
+      //       var days = expiresAt.diff(subscribedAt, 'day')
+      //       this.licenseKeyExpiring = days > 0 && days <= 30
+      //       this.licenseKeyExpired = days === 0
+      //       this.loading = false
+      //       this.$router.push('/')
+      //     } else {
+      //       this.loading = false
+      //     }
+      //   } catch (e) {
+      //     this.loading = false
+      //   }
+      // }
     },
     async activateMachine (key, machineId, data) {
       const activateMachine = await axios.post(`${API_DOMAIN}/license/activate`, {
