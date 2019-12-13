@@ -10,6 +10,10 @@ const state = {
     http: '',
     https: '',
     bypass: ''
+  },
+  auth: {
+    user: '',
+    pass: ''
   }
 }
 
@@ -21,6 +25,7 @@ const mutations = {
     state.themeOption = store.get('settings.theme_option')
     state.oldestArticles = store.get('settings.oldestArticles')
     state.proxy = store.get('settings.proxy')
+    state.auth = store.get('settings.auth')
     if (store.get('pocket_token')) {
       state.pocket_connected = true
     }
@@ -45,6 +50,9 @@ const mutations = {
   },
   SET_POCKET_CONNECTED (state) {
     state.pocket_connected = true
+  },
+  SET_AUTH (state, data) {
+    state.auth = data
   }
 }
 
@@ -78,6 +86,10 @@ const actions = {
   setProxy ({ commit }, data) {
     store.set('settings.proxy', data)
     commit('SET_PROXY')
+  },
+  setAuth ({ commit }, data) {
+    store.set('settings.auth', data)
+    commit('SET_AUTH', data)
   }
 }
 

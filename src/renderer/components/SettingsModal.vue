@@ -15,6 +15,16 @@
       :options="options"
       name="sortPref" @input="saveSortPreference"/>
     </b-form-group>
+     <h5>Authorize Settings</h5>
+    <b-form-group label="Username:">
+      <b-form-input v-model="auth.user"
+      type="text"></b-form-input>
+    </b-form-group>
+    <b-form-group label="Password:">
+      <b-form-input v-model="auth.pass"
+      type="password"></b-form-input>
+    </b-form-group>
+    <b-button @click="applyAuth">Apply Authorize</b-button>
     <h5>Proxy Settings</h5>
     <b-form-group label="Web Server (HTTP):">
       <b-form-input v-model="proxy.http"
@@ -68,6 +78,10 @@ export default {
         http: '',
         https: '',
         bypass: ''
+      },
+      auth: {
+        user: '',
+        pass: ''
       }
     }
   },
@@ -81,6 +95,10 @@ export default {
       this.proxy.http = this.$store.state.Setting.proxy.http
       this.proxy.https = this.$store.state.Setting.proxy.https
       this.proxy.bypass = this.$store.state.Setting.proxy.bypass
+    }
+    if (this.$store.state.Setting.auth) {
+      this.auth.user = this.$store.state.Setting.auth.user
+      this.auth.pass = this.$store.state.Setting.auth.pass
     }
   },
   methods: {
@@ -142,6 +160,15 @@ export default {
       this.$store.dispatch('setProxy', this.proxy)
       this.$electron.remote.app.relaunch()
       this.$electron.remote.app.exit(0)
+    },
+    applyAuth () {
+      this.$store.dispatch('setAuth', this.auth)
+      this.$toasted.show('Change authorize settings.', {
+        theme: 'outline',
+        position: 'top-center',
+        duration: 3000
+      })
+      this.hideModal()
     }
   }
 }
