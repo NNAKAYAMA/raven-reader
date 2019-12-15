@@ -232,7 +232,13 @@ function createMenu () {
       },
       {
         role: 'quit'
+      },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: 'Alt+Command+I',
+        click: function () { mainWindow.toggleDevTools() }
       }
+
       ]
     })
   }
