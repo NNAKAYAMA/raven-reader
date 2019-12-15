@@ -9,7 +9,7 @@
     centered
     @hidden="onHidden"
   >
-      <form v-on:submit.prevent="fetchFeed">
+      <form v-on:submit.prevent="_fetchFeed">
         <b-input-group size="md">
           <b-input-group-text slot="prepend">
             <strong>
@@ -19,9 +19,9 @@
           </b-input-group-text>
           <b-input-group-text slot="append">
             <loader v-if="loading"></loader>
-            <div class="favicon-img" v-if="feeddata !== null && !loading">
-              <img :src="feeddata.site.favicon" height="20" />
-            </div>
+            <!-- <div class="favicon-img" v-if="feeddata !== null && !loading">
+              <img v-if="feeddata.site.favicon" :src="feeddata.site.favicon" height="20" />
+            </div> -->
           </b-input-group-text>
           <b-form-input
             class="no-border"
@@ -67,6 +67,7 @@ import he from 'he'
 import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
 import axios from 'axios'
+import FeedParser from 'feedparser'
 
 export default {
   name: 'addfeed-modal',
@@ -100,6 +101,97 @@ export default {
       const pass = this.$store.state.Setting.pass || ''
       const content = await axios.get(link, { auth: { username: user, password: pass } })
       return content.headers['content-type'] === 'application/xml'
+    },
+    async parseFeedParser (stream) {
+      const feed = {
+        items: []
+      }
+      return new Promise((resolve, reject) => {
+        stream.pipe(new FeedParser())
+          .on('error', reject)
+          .on('end', () => {
+            resolve(feed)
+          })
+          .on('readable', function () {
+            const streamFeed = this
+            feed.link = this.meta.link
+            feed.feedUrl = this.meta.xmlurl
+            feed.description = this.meta.description
+            feed.title = this.meta.title
+            feed.favicon = this.meta.favicon || ''
+            let item
+            while ((item = streamFeed.read())) {
+              feed.items.push(item)
+            }
+          })
+      })
+    },
+    ParseFeedPost (feed) {
+      feed.posts.map((item) => {
+        item.favourite = false
+        item.read = false
+        item.offline = false
+        item.favicon = ''
+        item.feed_title = feed.meta.title
+        item.feed_url = feed.meta.xmlurl
+        item.feed_link = feed.meta.link
+        if (item.content) {
+          item.content = he.unescape(item.content)
+        }
+        return item
+      })
+      return feed
+    },
+    async _fetchFeed () {
+      // const self = this
+      this.loading = true
+      if (!this.$store.state.Setting.offline) {
+        if (this.feed_url) {
+          try {
+            const auth = this.$store.state.Setting.auth
+            const stream = await axios.get(this.feed_url,
+              {
+                auth: {
+                  username: auth.user || '',
+                  password: auth.pass || ''
+                },
+                responseType: 'stream'
+              })
+            const feed = await this.parseFeedParser(stream.data)
+            const feeditem = {
+              meta: '',
+              posts: []
+            }
+            feeditem.meta = {
+              link: feed.link,
+              xmlurl: feed.feedUrl ? feed.feedUrl : this.feed_url,
+              favicon: '',
+              description: feed.description ? feed.description : null,
+              title: feed.title
+            }
+
+            feeditem.posts = feed.items
+            this.selected_feed = []
+            this.selected_feed.push(this.feed_url)
+            this.feeddata = {}
+            this.feeddata.feedUrls = []
+            this.feeddata.feedUrls = this.ParseFeedPost(feeditem)
+            this.loading = false
+          } catch (e) {
+            console.error(e)
+            this.showError()
+          }
+        } else {
+          this.showError()
+        }
+      } else {
+        this.$toasted.show('There is no internet connection', {
+          theme: 'outline',
+          position: 'top-center',
+          duration: 2000
+        })
+        this.loading = false
+      }
     },
     async fetchFeed () {
       const self = this
@@ -174,13 +266,13 @@ export default {
       this.$refs.addFeedModal.hide()
     },
     subscribe () {
-      const favicon = this.feeddata.site.favicon
+      // const favicon = this.feeddata.site.favicon ? this.feeddata.site.favicon : null
       if (this.newcategory) {
         this.$store.dispatch('addCategory', { id: uuid(this.newcategory), title: this.newcategory, type: 'category' })
       } else {
         this.newcategory = this.selectedCat
       }
-      helper.subscribe(this.selected_feed, this.newcategory, favicon, false)
+      helper.subscribe(this.selected_feed, this.newcategory, '', false)
       this.hideModal()
     },
     onHidden () {
