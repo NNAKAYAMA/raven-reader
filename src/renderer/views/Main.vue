@@ -7,7 +7,7 @@
           <li class="nav-item">
             <router-link class="nav-link feed-mix-link" to="/all" active-class="active">
               <feed-mix feed-id="allFeeds" mark="allFeeds">
-                <feather-icon name="list"></feather-icon>All Feeds
+                <feather-icon name="list"></feather-icon>すべてのフィード
                 <span class="sr-only">(current)</span>
                 <span
                   class="items-counter"
@@ -19,7 +19,7 @@
           <li class="nav-item">
             <router-link class="nav-link feed-mix-link" to="/favourites" active-class="active">
               <feed-mix feed-id="favourites" mark="favourites">
-                <feather-icon name="star"></feather-icon>Favourites
+                <feather-icon name="star"></feather-icon>お気に入り
                 <span
                   class="items-counter"
                   v-if="getArticlesCount('favourites','') > 0"
@@ -30,7 +30,7 @@
           <li class="nav-item">
             <router-link class="nav-link feed-mix-link" to="/unread" active-class="active">
               <feed-mix feed-id="unreadArticles" mark="unreadArticles">
-                <feather-icon name="circle"></feather-icon>Unread Articles
+                <feather-icon name="circle"></feather-icon>未読
                 <span
                   class="items-counter"
                   v-if="getArticlesCount('unread', '') > 0"
@@ -41,7 +41,7 @@
           <li class="nav-item">
             <router-link class="nav-link feed-mix-link" to="/read" active-class="active">
               <feed-mix feed-id="recentlyRead" mark="recentlyRead">
-                <feather-icon name="circle" filled></feather-icon>Recently Read
+                <feather-icon name="circle" filled></feather-icon>既読
                 <span
                   class="items-counter"
                   v-if="getArticlesCount('read', '') > 0"
@@ -52,7 +52,7 @@
           <li class="nav-item">
             <router-link class="nav-link feed-mix-link" to="/saved" active-class="active">
               <feed-mix feed-id="savedArticles" mark="savedArticles">
-                <feather-icon name="wifi-off"></feather-icon>Saved articles
+                <feather-icon name="wifi-off"></feather-icon>保存した記事
                 <span
                   class="items-counter"
                   v-if="getArticlesCount('saved', '') > 0"
@@ -60,16 +60,16 @@
               </feed-mix>
             </router-link>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="#" v-b-modal.integrations>
               <feather-icon name="package"></feather-icon>Integrations
             </a>
-          </li>
+          </li> -->
         </ul>
         <h6
           class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
         >
-          <span>Subscriptions</span>
+          <span>購読中</span>
         </h6>
         <ul class="nav flex-column">
           <template

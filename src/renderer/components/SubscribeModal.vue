@@ -13,7 +13,7 @@
         <b-input-group size="md">
           <b-input-group-text slot="prepend">
             <strong>
-              Add
+              追加
               <feather-icon name="plus"></feather-icon>
             </strong>
           </b-input-group-text>
@@ -43,20 +43,20 @@
         </template>
           <b-form-select v-model="selectedCat" :options="categoryItems" class="mb-3">
             <template slot="first">
-              <option :value="null">Please select category</option>
+              <option :value="null">カテゴリーを選んでください</option>
             </template>
           </b-form-select>
-          <p><button class="btn btn-link pl-0" type="button" @click="addCategory">Add new category</button></p>
+          <p><button class="btn btn-link pl-0" type="button" @click="addCategory">カテゴリー追加する</button></p>
           <p v-if="showAddCat"><b-form-input v-model="newcategory" placeholder="Enter new category"></b-form-input></p>
       </div>
     <div slot="modal-footer">
-      <button type="button" class="btn btn-secondary" @click="hideModal">Close</button>
+      <button type="button" class="btn btn-secondary" @click="hideModal">閉じる</button>
       <button
         type="button"
         class="btn btn-primary"
         @click="subscribe"
         :disabled="disableSubscribe"
-      >Subscribe</button>
+      >購読する</button>
     </div>
   </b-modal>
 </template>

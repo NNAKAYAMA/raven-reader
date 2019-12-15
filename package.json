@@ -93,9 +93,7 @@
           "path": "/ravenreader"
         }
       ],
-      "icon": "build/icons/icon.ico",
-      "certificateFile": "windows_codesign.pfx",
-      "certificatePassword": "hello!@#$%^"
+      "icon": "build/icons/icon.ico"
     },
     "linux": {
       "publish": [
@@ -200,6 +198,7 @@
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",
     "node-sass": "^4.9.0",
+    "parse-favicon": "^2.0.0",
     "require-dir": "^1.2.0",
     "sass-loader": "^8.0.0",
     "spectron": "^9.0.0",
