@@ -47,15 +47,16 @@ export default {
     }
   },
   mounted () {
-    this.checkLicenseKey()
+    // this.checkLicenseKey()
+    this.$router.push('/')
   },
   methods: {
-    async checkLicenseKey () {
-      const licenseKey = this.$electronstore.get('license_key')
+    checkLicenseKey () {
+      // const licenseKey = this.$electronstore.get('license_key')
       // if (true) {
       // if (licenseKey === TEST_LICENSE_KEY) {
-      this.$electronstore.set('license_key', licenseKey)
-      this.$router.push('/')
+      // this.$electronstore.set('license_key', licenseKey)
+      // this.$router.push('/')
       // } else {
       //   try {
       //     const checkLicenseKey = await axios.get(`${API_DOMAIN}/license/verify?license_key=${licenseKey}`)
