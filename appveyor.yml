@@ -20,9 +20,28 @@ install:
   - git reset --hard HEAD
   - npm install
   - node --version
-  - cp src/renderer/config.example.js src/renderer/config.js
+  - copy src/renderer/config.example.js src/renderer/config.js
 
 build_script:
   - npm run build
+
+artifacts:
+
+- path: build\*.exe
+  path: build\*.yml
+
+  name: Release
+
+deploy:
+
+- provider: GitHub
+
+  description: とりあえずインストーラー
+
+  auth_token: ${GITHUB_TOKEN}
+
+  artifact: Release
+
+  force_update: true
 
 test: off
