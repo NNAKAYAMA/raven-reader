@@ -27,7 +27,6 @@ build_script:
 
 artifacts:
   - path: build\*.exe
-  - path: build\*.yml
   - name: Release
 
 deploy:
