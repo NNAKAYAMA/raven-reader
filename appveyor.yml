@@ -15,12 +15,12 @@ cache:
 
 init:
   - git config --global core.autocrlf input
-  - cp src/renderer/config.example.js src/renderer/config.js
 install:
   - ps: Install-Product node 8 x64
   - git reset --hard HEAD
   - npm install
   - node --version
+  - cp src/renderer/config.example.js src/renderer/config.js
 
 build_script:
   - npm run build
