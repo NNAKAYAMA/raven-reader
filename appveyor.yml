@@ -15,7 +15,7 @@ cache:
 
 init:
   - git config --global core.autocrlf input
-
+  - cp src/renderer/config.example.js src/renderer/config.js
 install:
   - ps: Install-Product node 8 x64
   - git reset --hard HEAD
