@@ -1,17 +1,10 @@
 import he from 'he'
-// import got from 'got'
 import axios from 'axios'
 import FeedParser from 'feedparser'
-// import RssParser from 'rss-parser'
 import Store from 'electron-store'
+import * as spauth from 'node-sp-auth'
 
 const store = new Store()
-// const parser = new RssParser({
-//   defaultRSS: 2.0,
-//   headers: {
-//     'User-Agent': 'Raven Reader'
-//   }
-// })
 
 /**
  * Parse feed
@@ -24,21 +17,16 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
     meta: '',
     posts: []
   }
-  // try {
-  //   feed = await parser.parseURL(feedUrl)
-  // } catch (e) {
-  // const stream = await got.stream(feedUrl, { retries: 0 })
   const auth = store.get('settings.auth') || {}
+  let options = await spauth.getAuth(feed_url, {
+    username: auth.user || '',
+    password: auth.pass || ''
+  })
   const stream = await axios.get(feedUrl,
     {
-      auth: {
-        username: auth.user || '',
-        password: auth.pass || ''
-      },
+      headers: options.headers,
       responseType: 'stream'
     })
-  // feed = await parseFeedParser(stream)
-  // }
   const feed = await parseFeedParser(stream.data)
 
   feeditem.meta = {

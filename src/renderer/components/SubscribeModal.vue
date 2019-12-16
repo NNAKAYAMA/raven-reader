@@ -68,6 +68,7 @@ import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
 import axios from 'axios'
 import FeedParser from 'feedparser'
+import * as spauth from 'node-sp-auth'
 
 export default {
   name: 'addfeed-modal',
@@ -95,12 +96,6 @@ export default {
   methods: {
     addCategory () {
       this.showAddCat = !this.showAddCat
-    },
-    async isContentXML (link) {
-      const user = this.$store.state.Setting.auth || ''
-      const pass = this.$store.state.Setting.pass || ''
-      const content = await axios.get(link, { auth: { username: user, password: pass } })
-      return content.headers['content-type'] === 'application/xml'
     },
     async parseFeedParser (stream) {
       const feed = {
@@ -143,88 +138,44 @@ export default {
       return feed
     },
     async _fetchFeed () {
-      // const self = this
       this.loading = true
       if (!this.$store.state.Setting.offline) {
         if (this.feed_url) {
           try {
             const auth = this.$store.state.Setting.auth
-            const stream = await axios.get(this.feed_url,
-              {
-                auth: {
+            let options = await spauth.getAuth(this.feed_url, {
                   username: auth.user || '',
                   password: auth.pass || ''
-                },
-                responseType: 'stream'
-              })
-            const feed = await this.parseFeedParser(stream.data)
-            const feeditem = {
-              meta: '',
-              posts: []
-            }
-            feeditem.meta = {
-              link: feed.link,
-              xmlurl: feed.feedUrl ? feed.feedUrl : this.feed_url,
-              favicon: '',
-              description: feed.description ? feed.description : null,
-              title: feed.title
-            }
+            })
+            if(options.headers){
+              const stream = await axios.get(this.feed_url,
+                {
+                  headers: options.headers,
+                  responseType: 'stream'
+                })
+              const feed = await this.parseFeedParser(stream.data)
+              const feeditem = {
+                meta: '',
+                posts: []
+              }
+              feeditem.meta = {
+                link: feed.link,
+                xmlurl: feed.feedUrl ? feed.feedUrl : this.feed_url,
+                favicon: '',
+                description: feed.description ? feed.description : null,
+                title: feed.title
+              }
 
-            feeditem.posts = feed.items
-            this.selected_feed = []
-            this.selected_feed.push(this.feed_url)
-            this.feeddata = {}
-            this.feeddata.feedUrls = []
-            this.feeddata.feedUrls = this.ParseFeedPost(feeditem)
-            this.loading = false
+              feeditem.posts = feed.items
+              this.selected_feed = []
+              this.selected_feed.push(this.feed_url)
+              this.feeddata = {}
+              this.feeddata.feedUrls = []
+              this.feeddata.feedUrls = this.ParseFeedPost(feeditem)
+              this.loading = false
+            }
           } catch (e) {
             console.error(e)
-            this.showError()
-          }
-        } else {
-          this.showError()
-        }
-      } else {
-        this.$toasted.show('There is no internet connection', {
-          theme: 'outline',
-          position: 'top-center',
-          duration: 2000
-        })
-        this.loading = false
-      }
-    },
-    async fetchFeed () {
-      const self = this
-      this.loading = true
-      if (!this.$store.state.Setting.offline) {
-        if (this.feed_url) {
-          try {
-            const isXML = await this.isContentXML(normalizeUrl(this.feed_url, { stripWWW: false, removeTrailingSlash: false }))
-            finder(normalizeUrl(this.feed_url, { stripWWW: false, removeTrailingSlash: false }), { feedParserOptions: { feedurl: this.feed_url } }).then(
-              res => {
-                this.loading = false
-                res.feedUrls.map(item => {
-                  item.title = he.unescape(item.title)
-                  if (isXML) {
-                    item.url = self.feed_url
-                  }
-                  return item
-                })
-                if (res.feedUrls.length === 0) {
-                  this.showError()
-                } else {
-                  this.selected_feed = []
-                  this.selected_feed.push(res.feedUrls[0])
-                  this.feeddata = res
-                }
-              },
-              error => {
-                if (error) {
-                }
-                this.showError()
-              }
-            )
-          } catch (e) {
             this.showError()
           }
         } else {
