@@ -1,12 +1,12 @@
 <template>
   <b-modal id="settings" ref="settings" title="Settings" hide-footer centered>
-    <b-form-group label="Set refresh interval for news feed">
+    <b-form-group label="フィードを受信するタイミング">
       <b-form-select v-model="cronjob" :options="cron_options" size="sm" @change="saveCronjob"/>
     </b-form-group>
-    <b-form-group label="Choose appearance">
+    <b-form-group label="テーマ設定">
       <b-form-select v-model="theme_option" :options="themeOptions" size="sm" @change="saveAppearance" />
     </b-form-group>
-    <b-form-group label="Oldest articles first">
+    <b-form-group label="古い記事から表示する">
       <b-form-radio-group id="btnradios1"
       buttons
       button-variant="outline-primary"
@@ -15,17 +15,17 @@
       :options="options"
       name="sortPref" @input="saveSortPreference"/>
     </b-form-group>
-     <h5>Authorize Settings</h5>
-    <b-form-group label="Username:">
+     <h5>認証設定</h5>
+    <b-form-group label="ユーザー名:">
       <b-form-input v-model="auth.user"
       type="text"></b-form-input>
     </b-form-group>
-    <b-form-group label="Password:">
+    <b-form-group label="パスワード:">
       <b-form-input v-model="auth.pass"
       type="password"></b-form-input>
     </b-form-group>
-    <b-button @click="applyAuth">Apply Authorize</b-button>
-    <h5>Proxy Settings</h5>
+    <b-button @click="applyAuth">認証設定を保存</b-button>
+    <!-- <h5>Proxy Settings</h5>
     <b-form-group label="Web Server (HTTP):">
       <b-form-input v-model="proxy.http"
       type="text"></b-form-input>
@@ -39,7 +39,7 @@
       :rows="3"
       :max-rows="6"></b-form-textarea>
     </b-form-group>
-    <b-button @click="applyProxy">Apply proxy & restart</b-button>
+    <b-button @click="applyProxy">Apply proxy & restart</b-button> -->
   </b-modal>
 </template>
 <script>
