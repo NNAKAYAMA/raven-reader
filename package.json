@@ -68,14 +68,6 @@
     },
     "mac": {
       "darkModeSupport": true,
-      "publish": [
-        {
-          "provider": "spaces",
-          "name": "ridereceiptspro",
-          "region": "sfo2",
-          "path": "/ravenreader"
-        }
-      ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "./entitlements.mac.inherit.plist",
@@ -85,25 +77,9 @@
       "icon": "build/icons/icon.icns"
     },
     "win": {
-      "publish": [
-        {
-          "provider": "spaces",
-          "name": "ridereceiptspro",
-          "region": "sfo2",
-          "path": "/ravenreader"
-        }
-      ],
       "icon": "build/icons/icon.ico"
     },
     "linux": {
-      "publish": [
-        {
-          "provider": "spaces",
-          "name": "ridereceiptspro",
-          "region": "sfo2",
-          "path": "/ravenreader"
-        }
-      ],
       "category": "News",
       "icon": "build/icons"
     }
