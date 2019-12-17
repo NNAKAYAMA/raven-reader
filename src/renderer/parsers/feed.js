@@ -18,7 +18,7 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
     posts: []
   }
   const auth = store.get('settings.auth') || {}
-  let options = await spauth.getAuth(feed_url, {
+  let options = await spauth.getAuth(feedUrl, {
     username: auth.user || '',
     password: auth.pass || ''
   })
