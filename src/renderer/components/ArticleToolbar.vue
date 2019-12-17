@@ -14,7 +14,7 @@
     </div>
     <div class="article-buttons">
       <div class="wrap">
-        <button v-click-outside="vcoConfig" class="btn btn-toolbar" @click="openSettings" v-b-tooltip.hover title="Format Options">
+        <button v-click-outside="vcoConfig" class="btn btn-toolbar" @click="openSettings" v-b-tooltip.hover title="文字設定">
           <feather-icon name="settings"></feather-icon>
         </button>
       </div>
@@ -29,52 +29,23 @@
         </button>
       </div>
       <div class="wrap">
-        <button @click="openOriginal(article.url)" class="btn btn-toolbar js-external-link" v-b-tooltip.hover title="View original" ref="openlink">
+        <button @click="openOriginal(article.url)" class="btn btn-toolbar js-external-link" v-b-tooltip.hover title="ブラウザで見る" ref="openlink">
           <feather-icon name="globe" :success="original"></feather-icon>
         </button>
       </div>
       <div class="wrap">
-        <button class="btn btn-toolbar" @click="saveArticle" v-b-tooltip.hover title="Save article" ref="saveoffline">
+        <button class="btn btn-toolbar" @click="saveArticle" v-b-tooltip.hover title="保存する" ref="saveoffline">
           <feather-icon name="wifi-off" :success="article.offline"></feather-icon>
         </button>
       </div>
       <div class="wrap">
-        <b-dropdown variant="link" no-caret ref="socialshare" toogle-class="btn-toolbar">
-          <template slot="button-content" class="pt-1">
-            <feather-icon name="share-2"></feather-icon>
-          </template>
-          <b-dropdown-item v-if="pocketConnected" @click="saveToPocket(article.url)">
-                Pocket
-            </b-dropdown-item>
-          <b-dropdown-item>
-              <social-sharing :url="article.url" inline-template>
-                <network network="email">
-                  Email
-                </network>
-              </social-sharing>
-            </b-dropdown-item>
-          <b-dropdown-item>
-              <social-sharing :url="article.url" inline-template>
-                <network network="facebook">
-                  Facebook
-                </network>
-              </social-sharing>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <social-sharing :url="article.url" inline-template>
-                <network network="twitter">
-                    Twitter
-                </network>
-              </social-sharing>
-            </b-dropdown-item>
-            <b-dropdown-item>
-               <social-sharing :url="article.url" inline-template>
-                  <network network="linkedin">
-                    Linkedin
-                  </network>
-               </social-sharing>
-            </b-dropdown-item>
-        </b-dropdown>
+        <button class="btn btn-toolbar" v-b-tooltip.hover title="メール" ref="sendmail">
+          <social-sharing :url="article.url" inline-template>
+            <network network="email">
+              <feather-icon name="mail" />
+            </network>
+          </social-sharing>
+        </button>
       </div>
     </div>
   </div>
@@ -97,8 +68,6 @@
 </template>
 <script>
 import cacheService from '../services/cacheArticle'
-import Store from 'electron-store'
-import axios from 'axios'
 import vClickOutside from 'v-click-outside'
 
 const markTypes = {
@@ -109,8 +78,6 @@ const markTypes = {
   cache: 'CACHE',
   uncache: 'UNCACHE'
 }
-
-const store = new Store()
 
 export default {
   data () {
@@ -143,10 +110,10 @@ export default {
   },
   computed: {
     markFavouriteButton () {
-      return this.article.favourite ? 'Mark as unfavourite' : 'Mark as favourite'
+      return this.article.favourite ? 'お気に入りから外す' : 'お気に入り'
     },
     markReadButton () {
-      return this.article.read ? 'Mark as unread' : 'Mark as read'
+      return this.article.read ? '未読にする' : '既読にする'
     },
     pocketConnected () {
       return this.$store.state.Setting.pocket_connected
@@ -219,21 +186,6 @@ export default {
           })
         })
       }
-    },
-    saveToPocket (url) {
-      var credentials = JSON.parse(store.get('pocket_token'))
-      axios.post('https://getpocket.com/v3/add', {
-        url: url,
-        access_token: credentials.access_token,
-        consumer_key: credentials.consumer_key
-      }).then((data) => {
-        this.$toasted.show('Saved to pocket.', {
-          theme: 'outline',
-          position: 'top-center',
-          duration: 3000
-        })
-        this.$refs.socialshare.hide(true)
-      })
     },
     openSettings () {
       this.settingspanel = !this.settingspanel

@@ -8,15 +8,15 @@
               <feather-icon name="search"></feather-icon>
             </span>
           </div>
-          <input type="text" class="form-control" placeholder="Search" aria-label="Search" v-model="search">
+          <input type="text" class="form-control" placeholder="検索" aria-label="Search" v-model="search">
           <div class="toolsbar">
             <div class="tool">
-              <button class="btn btn-toolbar" type="button" @click="sync" v-b-tooltip.hover title="Sync">
+              <button class="btn btn-toolbar" type="button" @click="sync" v-b-tooltip.hover title="更新">
                 <feather-icon name="refresh-cw" :class="{ 'fa-spin': syncState }"></feather-icon>
               </button>
             </div>
             <div class="tool">
-              <button class="btn btn-toolbar" type="button" v-b-tooltip.hover title="Mark all as read" v-b-modal.markallread ref="markallread">
+              <button class="btn btn-toolbar" type="button" v-b-tooltip.hover title="すべて既読にする" v-b-modal.markallread ref="markallread">
                 <feather-icon name="check-circle"></feather-icon>
               </button>
             </div>
@@ -27,7 +27,7 @@
           <perfect-scrollbar class="list-group">
             <article-item v-if="filteredArticles.length > 0" :article="article" v-for="article in mapArticles(filteredArticles)" :key="article._id"></article-item>
             <div class="no-articles" v-if="filteredArticles.length === 0">
-              No articles available
+              新着なし
             </div>
           </perfect-scrollbar>
       </div>
@@ -85,7 +85,7 @@ export default {
       return !!article && article.id !== undefined && article.id === this.activeArticleId
     },
     itemsChange () {
-      this.$refs.statusMsg.innerText = `${this.filteredArticles.length} items`
+      this.$refs.statusMsg.innerText = `${this.filteredArticles.length} 件`
     },
     sync () {
       const self = this
