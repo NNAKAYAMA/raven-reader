@@ -21,7 +21,7 @@ install:
   - git reset --hard HEAD
   - npm install
   - node --version
-  - copy src/renderer/config.example.js src/renderer/config.js
+  - cp src/renderer/config.example.js src/renderer/config.js
 
 build_script:
   - npm run build
