@@ -61,8 +61,6 @@
   </b-modal>
 </template>
 <script>
-import finder from 'rss-finder'
-import normalizeUrl from 'normalize-url'
 import he from 'he'
 import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
