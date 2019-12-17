@@ -9,7 +9,7 @@
     centered
     @hidden="onHidden"
   >
-      <form v-on:submit.prevent="_fetchFeed">
+      <form v-on:submit.prevent="fetchFeed">
         <b-input-group size="md">
           <b-input-group-text slot="prepend">
             <strong>
@@ -33,13 +33,15 @@
       </form>
       <div v-if="feeddata !== null" class="subscription-content col pt-3">
         <template v-for="(feed) in feeddata.feedUrls">
-          <b-input-group size="md">
-            <b-input-group-text slot="append">
-              <b-form-checkbox v-model="selected_feed" :value="feed"></b-form-checkbox>
-            </b-input-group-text>
-            <b-form-input v-model="feed.title"></b-form-input>
-          </b-input-group>
-          <b-form-text id="inputLiveHelp" class="mb-3">{{ feed.url }}</b-form-text>
+          <div :key="feed.id">
+            <b-input-group size="md">
+              <b-input-group-text slot="append">
+                <b-form-checkbox v-model="selected_feed" :value="feed"></b-form-checkbox>
+              </b-input-group-text>
+              <b-form-input v-model="feed.title"></b-form-input>
+            </b-input-group>
+            <b-form-text id="inputLiveHelp" class="mb-3">{{ feed.url }}</b-form-text>
+          </div>
         </template>
           <b-form-select v-model="selectedCat" :options="categoryItems" class="mb-3">
             <template slot="first">
@@ -61,19 +63,16 @@
   </b-modal>
 </template>
 <script>
-import finder from 'rss-finder'
-import normalizeUrl from 'normalize-url'
-import he from 'he'
 import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
-import axios from 'axios'
-import FeedParser from 'feedparser'
-
+import nodeFetch from 'node-fetch'
+import RssParser from 'rss-parser'
+const parser = new RssParser()
 export default {
   name: 'addfeed-modal',
   data () {
     return {
-      feed_url: '',
+      feed_url: 'https://news.yahoo.co.jp/pickup/rss.xml',
       loading: false,
       feeddata: null,
       newcategory: null,
@@ -96,135 +95,31 @@ export default {
     addCategory () {
       this.showAddCat = !this.showAddCat
     },
-    async isContentXML (link) {
-      const user = this.$store.state.Setting.auth || ''
-      const pass = this.$store.state.Setting.pass || ''
-      const content = await axios.get(link, { auth: { username: user, password: pass } })
-      return content.headers['content-type'] === 'application/xml'
-    },
-    async parseFeedParser (stream) {
-      const feed = {
-        items: []
-      }
-      return new Promise((resolve, reject) => {
-        stream.pipe(new FeedParser())
-          .on('error', reject)
-          .on('end', () => {
-            resolve(feed)
-          })
-          .on('readable', function () {
-            const streamFeed = this
-            feed.link = this.meta.link
-            feed.feedUrl = this.meta.xmlurl
-            feed.description = this.meta.description
-            feed.title = this.meta.title
-            feed.favicon = this.meta.favicon || ''
-            let item
-            while ((item = streamFeed.read())) {
-              feed.items.push(item)
-            }
-          })
-      })
-    },
-    ParseFeedPost (feed) {
-      feed.posts.map((item) => {
-        item.favourite = false
-        item.read = false
-        item.offline = false
-        item.favicon = ''
-        item.feed_title = feed.meta.title
-        item.feed_url = feed.meta.xmlurl
-        item.feed_link = feed.meta.link
-        if (item.content) {
-          item.content = he.unescape(item.content)
-        }
-        return item
-      })
-      return feed
-    },
-    async _fetchFeed () {
-      // const self = this
-      this.loading = true
-      if (!this.$store.state.Setting.offline) {
-        if (this.feed_url) {
-          try {
-            const auth = this.$store.state.Setting.auth
-            const stream = await axios.get(this.feed_url,
-              {
-                auth: {
-                  username: auth.user || '',
-                  password: auth.pass || ''
-                },
-                responseType: 'stream'
-              })
-            const feed = await this.parseFeedParser(stream.data)
-            const feeditem = {
-              meta: '',
-              posts: []
-            }
-            feeditem.meta = {
-              link: feed.link,
-              xmlurl: feed.feedUrl ? feed.feedUrl : this.feed_url,
-              favicon: '',
-              description: feed.description ? feed.description : null,
-              title: feed.title
-            }
-
-            feeditem.posts = feed.items
-            this.selected_feed = []
-            this.selected_feed.push(this.feed_url)
-            this.feeddata = {}
-            this.feeddata.feedUrls = []
-            this.feeddata.feedUrls = this.ParseFeedPost(feeditem)
-            this.loading = false
-          } catch (e) {
-            console.error(e)
-            this.showError()
-          }
-        } else {
-          this.showError()
-        }
-      } else {
-        this.$toasted.show('There is no internet connection', {
-          theme: 'outline',
-          position: 'top-center',
-          duration: 2000
-        })
-        this.loading = false
+    async parseRSS (feedUrl) {
+      const res = await nodeFetch(feedUrl)
+      const body = await res.text()
+      const feed = await parser.parseString(body)
+      console.log(feed)
+      return {
+        link: feed.link,
+        xmlurl: feed.feedUrl ? feed.feedUrl : feedUrl,
+        favicon: '',
+        description: feed.description ? feed.description : null,
+        title: feed.title,
+        posts: feed.items
       }
     },
     async fetchFeed () {
-      const self = this
       this.loading = true
       if (!this.$store.state.Setting.offline) {
         if (this.feed_url) {
           try {
-            const isXML = await this.isContentXML(normalizeUrl(this.feed_url, { stripWWW: false, removeTrailingSlash: false }))
-            finder(normalizeUrl(this.feed_url, { stripWWW: false, removeTrailingSlash: false }), { feedParserOptions: { feedurl: this.feed_url } }).then(
-              res => {
-                this.loading = false
-                res.feedUrls.map(item => {
-                  item.title = he.unescape(item.title)
-                  if (isXML) {
-                    item.url = self.feed_url
-                  }
-                  return item
-                })
-                if (res.feedUrls.length === 0) {
-                  this.showError()
-                } else {
-                  this.selected_feed = []
-                  this.selected_feed.push(res.feedUrls[0])
-                  this.feeddata = res
-                }
-              },
-              error => {
-                if (error) {
-                }
-                this.showError()
-              }
-            )
+            this.selected_feed = []
+            this.feeddata = {}
+            this.feeddata.feedUrls = [await this.parseRSS(this.feed_url)]
+            this.loading = false
           } catch (e) {
+            console.error(e)
             this.showError()
           }
         } else {

@@ -12,10 +12,10 @@ import {
 import jetpack from 'fs-jetpack'
 import os from 'os'
 import Store from 'electron-store'
-import {
-  checkForUpdates,
-  autoUpdateApp
-} from './updater.js'
+// import {
+//   checkForUpdates,
+//   autoUpdateApp
+// } from './updater.js'
 import {
   enforceMacOSAppLocation,
   darkMode
@@ -203,12 +203,12 @@ function createMenu () {
         label: `Version ${version}`,
         enabled: false
       },
-      {
-        label: 'Check for update',
-        click: function (menuItem, browserWindow, event) {
-          checkForUpdates(menuItem, browserWindow, event)
-        }
-      },
+      // {
+      //   label: 'Check for update',
+      //   click: function (menuItem, browserWindow, event) {
+      //     checkForUpdates(menuItem, browserWindow, event)
+      //   }
+      // },
       {
         label: 'Settings',
         id: 'settings',
@@ -253,17 +253,17 @@ function createMenu () {
         label: `Version ${version}`,
         enabled: false
       },
-      {
-        label: 'Check for update',
-        click: function (menuItem, browserWindow, event) {
-          checkForUpdates(menuItem, browserWindow, event)
-        }
-      },
+      // {
+      //   label: 'Check for update',
+      //   click: function (menuItem, browserWindow, event) {
+      //     checkForUpdates(menuItem, browserWindow, event)
+      //   }
+      // },
       {
         type: 'separator'
       },
       {
-        label: 'Settings',
+        label: '設定',
         id: 'settings',
         accelerator: 'CmdOrCtrl+,',
         type: 'normal',
@@ -483,7 +483,7 @@ app.on('ready', () => {
 app.whenReady().then(() => {
   enforceMacOSAppLocation()
   if (process.env.NODE_ENV === 'production') {
-    autoUpdateApp()
+    // autoUpdateApp()
   }
 })
 
