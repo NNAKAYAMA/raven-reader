@@ -14,14 +14,11 @@
           <b-input-group-text slot="prepend">
             <strong>
               追加
-              <feather-icon name="plus"></feather-icon>
+              <feather-icon name="plus" />
             </strong>
           </b-input-group-text>
           <b-input-group-text slot="append">
-            <loader v-if="loading"></loader>
-            <!-- <div class="favicon-img" v-if="feeddata !== null && !loading">
-              <img v-if="feeddata.site.favicon" :src="feeddata.site.favicon" height="20" />
-            </div> -->
+            <loader v-if="loading" />
           </b-input-group-text>
           <b-form-input
             class="no-border"
@@ -32,53 +29,43 @@
         </b-input-group>
       </form>
       <div v-if="feeddata !== null" class="subscription-content col pt-3">
-        <template v-for="(feed) in feeddata.feedUrls">
-          <div :key="feed.id">
-            <b-input-group size="md">
-              <b-input-group-text slot="append">
-                <b-form-checkbox v-model="selected_feed" :value="feed"></b-form-checkbox>
-              </b-input-group-text>
-              <b-form-input v-model="feed.title"></b-form-input>
-            </b-input-group>
-            <b-form-text id="inputLiveHelp" class="mb-3">{{ feed.url }}</b-form-text>
-          </div>
-        </template>
-          <b-form-select v-model="selectedCat" :options="categoryItems" class="mb-3">
-            <template slot="first">
-              <option :value="null">カテゴリーを選んでください</option>
-            </template>
-          </b-form-select>
-          <p><button class="btn btn-link pl-0" type="button" @click="addCategory">カテゴリー追加する</button></p>
-          <p v-if="showAddCat"><b-form-input v-model="newcategory" placeholder="Enter new category"></b-form-input></p>
+        <b-input-group size="md">
+          <b-form-input v-model="feeddata.meta.title"></b-form-input>
+        </b-input-group>
+        <b-form-text id="inputLiveHelp" class="mb-3">{{ feeddata.meta.xmlurl }}</b-form-text>
+        <b-form-select v-model="selectedCat" :options="categoryItems" class="mb-3">
+          <template slot="first">
+            <option :value="null">カテゴリーを選んでください</option>
+          </template>
+        </b-form-select>
+        <p><button class="btn btn-link pl-0" type="button" @click="addCategory">カテゴリー追加する</button></p>
+        <p v-if="showAddCat"><b-form-input v-model="newcategory" placeholder="Enter new category"></b-form-input></p>
       </div>
-    <div slot="modal-footer">
-      <button type="button" class="btn btn-secondary" @click="hideModal">閉じる</button>
-      <button
-        type="button"
-        class="btn btn-primary"
-        @click="subscribe"
-        :disabled="disableSubscribe"
-      >購読する</button>
-    </div>
-  </b-modal>
+      <div slot="modal-footer">
+        <button type="button" class="btn btn-secondary" @click="hideModal">閉じる</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          @click="subscribe"
+          :disabled="disableSubscribe"
+        >購読する</button>
+      </div>
+    </b-modal>
 </template>
 <script>
 import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
-import nodeFetch from 'node-fetch'
-import RssParser from 'rss-parser'
-const parser = new RssParser()
+import {parseFeed} from '../parsers/feed'
 export default {
   name: 'addfeed-modal',
   data () {
     return {
-      feed_url: 'https://news.yahoo.co.jp/pickup/rss.xml',
+      feed_url: '',
       loading: false,
       feeddata: null,
       newcategory: null,
       showAddCat: false,
       selectedCat: null,
-      selected_feed: []
     }
   },
   computed: {
@@ -95,28 +82,12 @@ export default {
     addCategory () {
       this.showAddCat = !this.showAddCat
     },
-    async parseRSS (feedUrl) {
-      const res = await nodeFetch(feedUrl)
-      const body = await res.text()
-      const feed = await parser.parseString(body)
-      console.log(feed)
-      return {
-        link: feed.link,
-        xmlurl: feed.feedUrl ? feed.feedUrl : feedUrl,
-        favicon: '',
-        description: feed.description ? feed.description : null,
-        title: feed.title,
-        posts: feed.items
-      }
-    },
     async fetchFeed () {
       this.loading = true
       if (!this.$store.state.Setting.offline) {
         if (this.feed_url) {
           try {
-            this.selected_feed = []
-            this.feeddata = {}
-            this.feeddata.feedUrls = [await this.parseRSS(this.feed_url)]
+            this.feeddata = await parseFeed(this.feed_url)
             this.loading = false
           } catch (e) {
             console.error(e)
@@ -150,7 +121,6 @@ export default {
       this.feed_url = ''
       this.feeddata = null
       this.url = ''
-      this.selected_feed = []
       this.loading = false
       this.newcategory = null
       this.showAddCat = false
@@ -161,13 +131,12 @@ export default {
       this.$refs.addFeedModal.hide()
     },
     subscribe () {
-      // const favicon = this.feeddata.site.favicon ? this.feeddata.site.favicon : null
       if (this.newcategory) {
         this.$store.dispatch('addCategory', { id: uuid(this.newcategory), title: this.newcategory, type: 'category' })
       } else {
         this.newcategory = this.selectedCat
       }
-      helper.subscribe(this.selected_feed, this.newcategory, '', false)
+      helper.subscribe([this.feeddata], this.newcategory, '', false)
       this.hideModal()
     },
     onHidden () {

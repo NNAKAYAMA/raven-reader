@@ -1,17 +1,27 @@
 import he from 'he'
-import nodeFetch from 'node-fetch'
 import RssParser from 'rss-parser'
+import Store from 'electron-store'
+import spauth from 'node-sp-auth'
 const parser = new RssParser()
-
+const decoder = new TextDecoder()
+const store = new Store()
 /**
  * Parse feed
  * @param  string feedUrl
  * @return array
  */
 export async function parseFeed (feedUrl, faviconUrl = null) {
-  const res = await nodeFetch(feedUrl)
-  const body = await res.text()
-  const feed = await parser.parseString(body)
+  try{
+    const auth = store.get("stettings.auth")
+    const opt = await spauth(feedUrl,{username:atuth.user,password:auth.pass})
+    console.log(opt)  
+  }catch(e){
+    console.error(e)
+  }
+  const res = await fetch(url)
+  const reader = await res.body.getReader()
+  const {value} = await reader.read()
+  const feed = await parser.parseString(decoder.decode(value))
   return ParseFeedPost({
     meta: {
       link: feed.link,
