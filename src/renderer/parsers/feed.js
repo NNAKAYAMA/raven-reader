@@ -3,6 +3,7 @@ import nodeFetch from 'node-fetch'
 import RssParser from 'rss-parser'
 import Store from 'electron-store'
 import Shell from 'node-powershell'
+// import iconv from 'iconv-lite'
 const parser = new RssParser()
 const store = new Store()
 /**
@@ -13,17 +14,19 @@ const store = new Store()
 export async function parseFeed (feedUrl, faviconUrl = null) {
   try {
     let feed
-    const auth = store.get('stettings.auth')
+    const auth = store.get('settings.auth')
     if (auth && feedUrl.match(/aspx$/)) {
       const ps = new Shell({
         executionPolicy: 'Bypass',
         noProfile: true
       })
+      ps.addCommand('chcp 65001')
       ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
       ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
-      ps.addCommand(`(Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred).Content`)
+      ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
+      ps.addCommand('$res.content')
       const str = await ps.invoke()
-      feed = await parser.parseString(str)
+      feed = await parser.parseString(str.replace(/.*\r/, ''))
     } else {
       const res = await nodeFetch(feedUrl)
       const str = await res.text()
