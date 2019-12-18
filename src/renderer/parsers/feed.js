@@ -13,8 +13,10 @@ const store = new Store()
 export async function parseFeed (feedUrl, faviconUrl = null) {
   try{
     const auth = store.get("stettings.auth")
-    const opt = await spauth(feedUrl,{username:auth.user,password:auth.pass})
-    console.log(opt)  
+    if(auth && feedUrl.match(/aspx$/)){
+      const opt = await spauth(feedUrl,{username:auth.user,password:auth.pass})
+      console.log(opt)
+    }
   }catch(e){
     console.error(e)
   }
