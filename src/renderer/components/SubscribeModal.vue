@@ -55,7 +55,7 @@
 <script>
 import helper from '../services/helpers'
 import uuid from 'uuid-by-string'
-import {parseFeed} from '../parsers/feed'
+import { parseFeed } from '../parsers/feed'
 export default {
   name: 'addfeed-modal',
   data () {
@@ -65,7 +65,7 @@ export default {
       feeddata: null,
       newcategory: null,
       showAddCat: false,
-      selectedCat: null,
+      selectedCat: null
     }
   },
   computed: {

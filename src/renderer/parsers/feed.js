@@ -1,9 +1,9 @@
 import he from 'he'
+import nodeFetch from 'node-fetch'
 import RssParser from 'rss-parser'
 import Store from 'electron-store'
-import spauth from 'node-sp-auth'
+import Shell from 'node-powershell'
 const parser = new RssParser()
-const decoder = new TextDecoder()
 const store = new Store()
 /**
  * Parse feed
@@ -11,29 +11,37 @@ const store = new Store()
  * @return array
  */
 export async function parseFeed (feedUrl, faviconUrl = null) {
-  try{
-    const auth = store.get("stettings.auth")
-    if(auth && feedUrl.match(/aspx$/)){
-      const opt = await spauth(feedUrl,{username:auth.user,password:auth.pass})
-      console.log(opt)
+  try {
+    let feed
+    const auth = store.get('stettings.auth')
+    if (auth && feedUrl.match(/aspx$/)) {
+      const ps = new Shell({
+        executionPolicy: 'Bypass',
+        noProfile: true
+      })
+      ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
+      ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
+      ps.addCommand(`(Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred).Content`)
+      const str = await ps.invoke()
+      feed = await parser.parseString(str)
+    } else {
+      const res = await nodeFetch(feedUrl)
+      const str = await res.text()
+      feed = await parser.parseString(str)
     }
-  }catch(e){
+    return ParseFeedPost({
+      meta: {
+        link: feed.link,
+        xmlurl: feed.feedUrl ? feed.feedUrl : feedUrl,
+        favicon: faviconUrl,
+        description: feed.description ? feed.description : null,
+        title: feed.title
+      },
+      posts: feed.items
+    })
+  } catch (e) {
     console.error(e)
   }
-  const res = await fetch(feedUrl)
-  const reader = await res.body.getReader()
-  const {value} = await reader.read()
-  const feed = await parser.parseString(decoder.decode(value))
-  return ParseFeedPost({
-    meta: {
-      link: feed.link,
-      xmlurl: feed.feedUrl ? feed.feedUrl : feedUrl,
-      favicon: faviconUrl,
-      description: feed.description ? feed.description : null,
-      title: feed.title
-    },
-    posts: feed.items
-  })
 }
 
 /**

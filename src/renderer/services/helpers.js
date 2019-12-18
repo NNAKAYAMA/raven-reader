@@ -88,7 +88,7 @@ export default {
 
     feeds.forEach(async function (feed) {
       let url
-      var faviconUrl
+      let faviconUrl
 
       if (!importData) {
         url = feed.url
@@ -102,7 +102,7 @@ export default {
         url = feed.feedUrl
       }
 
-      const feeditem = await parseFeed(url, faviconUrl)
+      const feeditem = feed.meta ? feed : await parseFeed(url, faviconUrl)
 
       if (!refresh) {
         feeditem.meta.category = category

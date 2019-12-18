@@ -82,6 +82,11 @@ function createMenu () {
     label: 'View',
     submenu: [{
       role: 'togglefullscreen'
+    },
+    {
+      label: 'Toggle Developer Tools',
+      accelerator: 'Alt+Command+I',
+      click: function () { mainWindow.toggleDevTools() }
     }]
   },
   {
@@ -210,7 +215,7 @@ function createMenu () {
       //   }
       // },
       {
-        label: 'Settings',
+        label: '設定',
         id: 'settings',
         type: 'normal',
         accelerator: 'CmdOrCtrl+,',
@@ -232,13 +237,7 @@ function createMenu () {
       },
       {
         role: 'quit'
-      },
-      {
-        label: 'Toggle Developer Tools',
-        accelerator: 'Alt+Command+I',
-        click: function () { mainWindow.toggleDevTools() }
       }
-
       ]
     })
   }
