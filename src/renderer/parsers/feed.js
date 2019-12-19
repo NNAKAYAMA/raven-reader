@@ -3,7 +3,6 @@ import nodeFetch from 'node-fetch'
 import RssParser from 'rss-parser'
 import Store from 'electron-store'
 import Shell from 'node-powershell'
-// import iconv from 'iconv-lite'
 const parser = new RssParser()
 const store = new Store()
 /**
@@ -26,7 +25,7 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
       ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
       ps.addCommand('$res.content')
       const str = await ps.invoke()
-      feed = await parser.parseString(str.replace(/.*\r/, ''))
+      feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
     } else {
       const res = await nodeFetch(feedUrl)
       const str = await res.text()
