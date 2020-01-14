@@ -507,7 +507,7 @@ export default {
     prepareArticleData (data, article) {
       const self = this
       self.empty = false
-      const $ = cheerio.load(data.content)
+      const $ = cheerio.load(data.content === null ? article.content : data.content)
       $('a').addClass('js-external-link')
       $('img').addClass('img-fluid')
       $('iframe').parent().addClass('embed-responsive embed-responsive-16by9')
