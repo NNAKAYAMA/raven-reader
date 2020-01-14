@@ -39,7 +39,7 @@
   },
   "build": {
     "productName": "Raven Reader",
-    "appId": "org.helloefficiency.ravenreader",
+    "appId": "org.nnkayama.ravenreader",
     "afterSign": "notarize.js",
     "directories": {
       "output": "build"

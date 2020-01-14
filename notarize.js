@@ -13,7 +13,7 @@ exports.default = async function notarizing (context) {
   const appName = context.packager.appInfo.productFilename
 
   const notarize = await electronNotarize.notarize({
-    appBundleId: 'org.helloefficiency.ravenreader',
+    appBundleId: 'org.nnakayama.ravenreader',
     appPath: `${appOutDir}/${appName}.app`,
     appleId: process.env.appleId,
     appleIdPassword: process.env.applePass
