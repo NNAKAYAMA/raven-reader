@@ -439,7 +439,7 @@ function createWindow () {
     }
   })
 
-  session.defaultSession.allowNTLMCredentialsForDomains()
+  session.defaultSession.allowNTLMCredentialsForDomains('*')
 
   mainWindow.on('closed', () => {
     mainWindow = null
