@@ -438,6 +438,8 @@ function createWindow () {
     }
   })
 
+  mainWindow.webContents.session.defaultSession.allowNTLMCredentialsForDomains()
+
   mainWindow.on('closed', () => {
     mainWindow = null
   })
