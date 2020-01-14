@@ -553,6 +553,7 @@ export default {
         self.loading = true
         db.fetchArticle(this.$route.params.id, async function (article) {
           let data
+          console.log(article)
           if (self.$store.state.Setting.offline) {
             data = await cacheService.getCachedArticleData(
               article._id,
