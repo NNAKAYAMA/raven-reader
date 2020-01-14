@@ -7,7 +7,8 @@ import {
   Tray,
   ipcMain,
   globalShortcut,
-  systemPreferences
+  systemPreferences,
+  session
 } from 'electron'
 import jetpack from 'fs-jetpack'
 import os from 'os'
@@ -438,7 +439,7 @@ function createWindow () {
     }
   })
 
-  mainWindow.webContents.session.defaultSession.allowNTLMCredentialsForDomains()
+  session.defaultSession.allowNTLMCredentialsForDomains()
 
   mainWindow.on('closed', () => {
     mainWindow = null

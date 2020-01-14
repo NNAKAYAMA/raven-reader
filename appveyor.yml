@@ -30,11 +30,11 @@ artifacts:
   - path: build\*.exe
     name: Release
 
-deploy:
-  - provider: GitHub
-    description: とりあえずインストーラー
-    auth_token: ${GITHUB_TOKEN}
-    artifact: Release
-    force_update: true
+# deploy:
+#   - provider: GitHub
+#     description: とりあえずインストーラー
+#     auth_token: ${GITHUB_TOKEN}
+#     artifact: Release
+#     force_update: true
 
 test: off
