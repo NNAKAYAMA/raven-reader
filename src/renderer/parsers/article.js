@@ -4,7 +4,7 @@ export async function parseArticle (url) {
   try {
     const result = await Mercury.parse(url)
     return result
-  } catch {
+  } catch (e) {
     return null
   }
 }

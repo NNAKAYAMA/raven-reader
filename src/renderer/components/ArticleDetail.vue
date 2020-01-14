@@ -5,7 +5,7 @@
       <perfect-scrollbar v-if="!originalArticle" class="article-contentarea" :class="{ 'px-4': !originalArticle, 'px-0 py-0': originalArticle }" v-bind:style="{ fontFamily: currentFontStyle }">
         <div class="article-wrap" v-bind:class="{ 'offset-content': fontSettingsOn }" v-if="article !== null && article.content !== null && !emptyState && !originalArticle" v-bind:style="{ fontSize: `${currentFontSize}% !important` }">
           <h2>
-            <strong>{{ article.title }}</strong><br/>
+            <strong><a :href="article.link">{{ article.title }}</a></strong><br/>
             <small><span v-if="article.date_published">{{ article.date_published }} </span> <span v-if="article.author">by {{ article.author }}</span>  <strong v-if="article.date_published || article.date_published">&#183;</strong> {{ article.readtime }}</small>
           </h2>
           <div class="article-detail" v-if="article.content" v-html="article.content"></div>
@@ -23,7 +23,7 @@
         <div class="article-detail d-flex flex-column justify-content-center align-items-center
 ">
           <h3 class="mb-4">Whoops! not able to load content.</h3>
-          <a :href="article.url" class="btn btn-primary btn-outline-primary js-external-link">
+          <a :href="article.link" class="btn btn-primary btn-outline-primary js-external-link">
             View it on web
           </a>
         </div>
