@@ -103,7 +103,7 @@ export default {
       }
 
       const feeditem = await parseFeed(url, faviconUrl)
-
+      feeditem.meta = feed.meta ? feed.meta : feeditem.meta
       if (!refresh) {
         feeditem.meta.category = category
       }
