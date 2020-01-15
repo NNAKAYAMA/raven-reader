@@ -21,22 +21,23 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
     let feed
     const auth = store.get('settings.auth')
     if (auth && feedUrl.match(/aspx$/)) {
-      // const ps = new Shell({
-      //   executionPolicy: 'Bypass',
-      //   noProfile: true
-      // })
-      // ps.addCommand('chcp 65001')
-      // ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
-      // ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
-      // ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
-      // ps.addCommand('$res.content')
-      // const str = await ps.invoke()
-      // feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
-      const res = await client({
-        method: 'get',
-        url: feedUrl
-      })
+      const res = await client.get(feedUrl)
+      console.log(res)
+      console.log(res.data)
       feed = await parser.parseString(res.data)
+      if(!feed.link){
+        const ps = new Shell({
+          executionPolicy: 'Bypass',
+          noProfile: true
+        })
+        ps.addCommand('chcp 65001')
+        ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
+        ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
+        ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
+        ps.addCommand('$res.content')
+        const str = await ps.invoke()
+        feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
+      }
     } else {
       const res = await axios(feedUrl)
       feed = await parser.parseString(res.data)
