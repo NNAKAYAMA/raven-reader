@@ -22,6 +22,7 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
     const auth = store.get('settings.auth')
     if (auth && feedUrl.match(/aspx$/)) {
       const res = await client.get(feedUrl)
+      console.log('ntml url')
       console.log(res)
       console.log(res.data)
       feed = await parser.parseString(res.data)
@@ -40,6 +41,7 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
       }
     } else {
       const res = await axios(feedUrl)
+      console.log(res)
       feed = await parser.parseString(res.data)
     }
     return ParseFeedPost({
