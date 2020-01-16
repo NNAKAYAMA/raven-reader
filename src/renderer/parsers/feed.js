@@ -100,16 +100,20 @@ client.interceptors.response.use(
   (err) => {
     // IF DEV console.log('Response error:',err);
     const error = err.response
+    console.log(err)
+    console.log(err.config)
     // const options = new Options(err.config.url)
     const url = err.config.url
+    console.log(url)
     const auth = store.get('settings.auth')
     const options = {
       url: url,
       domain: new URL(url).hostname,
       username: auth.username,
       password: auth.password,
-      workstation: hostname
+      workstation: hostname()
     }
+    console.log(options)
     if (error.status === 401 && error.headers['www-authenticate'] && error.headers['www-authenticate'] === 'Negotiate, NTLM' && !err.config.headers['X-retry']) {
       // TYPE 1 MESSAGE
       return sendType1Message(options)
