@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-const buffer = require('buffer')
+const buffer = require('buffer').Buffer
 const createCipheriv = require('browserify-cipher').createCipheriv
 const createHash = require('create-hash')
 const md4 = require('js-md4')
