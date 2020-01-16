@@ -105,12 +105,12 @@ client.interceptors.response.use(
     // const options = new Options(err.config.url)
     const url = err.config.url
     console.log(url)
-    const auth = Store.get('settings.auth')
+    const auth = store.get('settings.auth')
     const options = {
       url: url,
       domain: new URL(url).hostname,
-      username: auth.username,
-      password: auth.password,
+      username: auth.user,
+      password: auth.pass,
       workstation: hostname()
     }
     console.log(options)
