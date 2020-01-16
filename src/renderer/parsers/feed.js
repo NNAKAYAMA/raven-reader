@@ -105,7 +105,7 @@ client.interceptors.response.use(
     // const options = new Options(err.config.url)
     const url = err.config.url
     console.log(url)
-    const auth = store.get('settings.auth')
+    const auth = Store.get('settings.auth')
     const options = {
       url: url,
       domain: new URL(url).hostname,
@@ -130,8 +130,8 @@ client.interceptors.request.use((request) => {
   return request
 })
 
-const sendType1Message = (options) => {
-  const type1msg = ntlm.createType1Message()
+function sendType1Message (options) {
+  const type1msg = ntlm.createType1Message(options)
   return client({
     method: 'get',
     url: options.url,
@@ -142,7 +142,7 @@ const sendType1Message = (options) => {
   })
 }
 
-const sendType3Message = (token, options) => {
+function sendType3Message (token, options) {
   const type2msg = ntlm.parseType2Message(token, (err) => { console.log(err) })
   const type3msg = ntlm.createType3Message(type2msg, options)
   return client({
