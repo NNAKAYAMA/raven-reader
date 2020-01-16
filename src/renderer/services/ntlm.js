@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-var Buffer = require('buffer').Buffer.from
+var Buffer = require('buffer')
 var createCipheriv = require('browserify-cipher').createCipheriv
 var createHash = require('create-hash')
 var md4 = require('js-md4')
@@ -78,7 +78,7 @@ function createType1Message (options) {
   if (!domain || domain === '') { type1flags = type1flags - flags.NTLM_NegotiateOemDomainSupplied }
 
   var pos = 0
-  var buf = new Buffer(BODY_LENGTH + domain.length + workstation.length)
+  var buf = new Buffer.Buffer.alloc(BODY_LENGTH + domain.length + workstation.length)
 
   buf.write(protocol, pos, protocol.length); pos += protocol.length // protocol
   buf.writeUInt32LE(1, pos); pos += 4 // type 1
@@ -115,7 +115,7 @@ function parseType2Message (rawmsg, callback) {
     return null
   }
 
-  var buf = new Buffer(match[1], 'base64')
+  var buf = new Buffer.Buffer.from(match[1], 'base64')
 
   var msg = {}
 
@@ -165,15 +165,15 @@ function createType3Message (msg2, options) {
 
   var encryptedRandomSessionKey = ''
   if (isUnicode) {
-    workstationBytes = new Buffer(workstation, 'utf16le')
-    domainNameBytes = new Buffer(domainName, 'utf16le')
-    usernameBytes = new Buffer(username, 'utf16le')
-    encryptedRandomSessionKeyBytes = new Buffer(encryptedRandomSessionKey, 'utf16le')
+    workstationBytes = new Buffer.Buffer.from(workstation, 'utf16le')
+    domainNameBytes = new Buffer.Buffer.from(domainName, 'utf16le')
+    usernameBytes = new Buffer.Buffer.from(username, 'utf16le')
+    encryptedRandomSessionKeyBytes = new Buffer.Buffer.from(encryptedRandomSessionKey, 'utf16le')
   } else {
-    workstationBytes = new Buffer(workstation, 'ascii')
-    domainNameBytes = new Buffer(domainName, 'ascii')
-    usernameBytes = new Buffer(username, 'ascii')
-    encryptedRandomSessionKeyBytes = new Buffer(encryptedRandomSessionKey, 'ascii')
+    workstationBytes = new Buffer.Buffer.from(workstation, 'ascii')
+    domainNameBytes = new Buffer.Buffer.from(domainName, 'ascii')
+    usernameBytes = new Buffer.Buffer.from(username, 'ascii')
+    encryptedRandomSessionKeyBytes = new Buffer.Buffer.from(encryptedRandomSessionKey, 'ascii')
   }
 
   var lmChallengeResponse = calcResp((lmPassword !== null) ? lmPassword : createLMhashedPasswordv1(password), nonce)
@@ -185,7 +185,7 @@ function createType3Message (msg2, options) {
     for (var i = 0; i < 8; i++) {
       clientChallenge += String.fromCharCode(Math.floor(Math.random() * 256))
     }
-    var clientChallengeBytes = new Buffer(clientChallenge, 'ascii')
+    var clientChallengeBytes = new Buffer.Buffer.from(clientChallenge, 'ascii')
     var challenges = ntlm2srCalcResp(pwhash, nonce, clientChallengeBytes)
     lmChallengeResponse = challenges.lmChallengeResponse
     ntChallengeResponse = challenges.ntChallengeResponse
@@ -194,7 +194,7 @@ function createType3Message (msg2, options) {
   var signature = 'NTLMSSP\0'
 
   var pos = 0
-  var buf = new Buffer(BODY_LENGTH + domainNameBytes.length + usernameBytes.length + workstationBytes.length + lmChallengeResponse.length + ntChallengeResponse.length + encryptedRandomSessionKeyBytes.length)
+  var buf = new Buffer.Buffer.alloc(BODY_LENGTH + domainNameBytes.length + usernameBytes.length + workstationBytes.length + lmChallengeResponse.length + ntChallengeResponse.length + encryptedRandomSessionKeyBytes.length)
 
   buf.write(signature, pos, signature.length); pos += signature.length
   buf.writeUInt32LE(3, pos); pos += 4 // type 1
@@ -246,9 +246,9 @@ function createType3Message (msg2, options) {
 function createLMhashedPasswordv1 (password) {
   // fix the password length to 14 bytes
   password = password.toUpperCase()
-  var passwordBytes = new Buffer(password, 'ascii')
+  var passwordBytes = new Buffer.Buffer.from(password, 'ascii')
 
-  var passwordBytesPadded = new Buffer(14)
+  var passwordBytesPadded = new Buffer.Buffer.alloc(14)
   passwordBytesPadded.fill('\0')
   var sourceEnd = 14
   if (passwordBytes.length < 14) sourceEnd = passwordBytes.length
@@ -342,7 +342,7 @@ function binaryArray2bytes (array) {
     var hexchar1 = binary2hex[binString1]
     var hexchar2 = binary2hex[binString2]
 
-    var buf = new Buffer(hexchar1 + '' + hexchar2, 'hex')
+    var buf = new Buffer.Buffer.from(hexchar1 + '' + hexchar2, 'hex')
     bufArray.push(buf)
   }
 
@@ -350,15 +350,15 @@ function binaryArray2bytes (array) {
 }
 
 function createNThashedPasswordv1 (password) {
-  var buf = new Buffer(password, 'utf16le')
+  var buf = new Buffer.Buffer.from(password, 'utf16le')
   var hash = md4.create()
   hash.update(buf)
-  return new Buffer(hash.digest())
+  return new Buffer.Buffer.alloc(hash.digest())
 }
 
 function calcResp (passwordHash, serverChallenge) {
   // padding with zeros to make the hash 21 bytes long
-  var passHashPadded = new Buffer(21)
+  var passHashPadded = new Buffer.Buffer.alloc(21)
   passHashPadded.fill('\0')
   passwordHash.copy(passHashPadded, 0, 0, passwordHash.length)
 
@@ -378,7 +378,7 @@ function calcResp (passwordHash, serverChallenge) {
 
 function ntlm2srCalcResp (responseKeyNT, serverChallenge, clientChallenge) {
   // padding with zeros to make the hash 16 bytes longer
-  var lmChallengeResponse = new Buffer(clientChallenge.length + 16)
+  var lmChallengeResponse = new Buffer.Buffer.alloc(clientChallenge.length + 16)
   lmChallengeResponse.fill('\0')
   clientChallenge.copy(lmChallengeResponse, 0, 0, clientChallenge.length)
 
