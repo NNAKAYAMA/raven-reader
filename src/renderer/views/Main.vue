@@ -507,7 +507,7 @@ export default {
     prepareArticleData (data, article) {
       const self = this
       self.empty = false
-      const $ = cheerio.load(data.content)
+      const $ = cheerio.load(data.content === null ? article.content : data.content)
       $('a').addClass('js-external-link')
       $('img').addClass('img-fluid')
       $('iframe').parent().addClass('embed-responsive embed-responsive-16by9')
@@ -569,6 +569,8 @@ export default {
             self.prepareArticleData(data, article)
           } else if (!self.$store.state.Setting.offline && data) {
             self.prepareArticleData(data, article)
+          } else if (data === null) {
+            self.prepareArticleData(article, article)
           } else {
             console.log('EMPTY')
             article.content = null
