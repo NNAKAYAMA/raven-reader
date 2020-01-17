@@ -4,11 +4,11 @@ import axios from 'axios'
 import RssParser from 'rss-parser'
 import Store from 'electron-store'
 import Shell from 'node-powershell'
-import { URL } from 'url'
-import ntlm from '../services/ntlm'
-import https from 'https'
-import { hostname } from 'os'
-const httpsAgent = new https.Agent({ keepAlive: true })
+// import { URL } from 'url'
+// import ntlm from '../services/ntlm'
+// import https from 'https'
+// import { hostname } from 'os'
+// const httpsAgent = new https.Agent({ keepAlive: true })
 const parser = new RssParser()
 const store = new Store()
 /**
@@ -21,27 +21,27 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
     let feed
     const auth = store.get('settings.auth')
     if (auth && feedUrl.match(/aspx$/)) {
-      const res = await client.get(feedUrl)
-      console.log('ntml url')
-      console.log(res)
-      console.log(res.data)
-      feed = await parser.parseString(res.data)
-      if(!feed.link){
-        const ps = new Shell({
-          executionPolicy: 'Bypass',
-          noProfile: true
-        })
-        ps.addCommand('chcp 65001')
-        ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
-        ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
-        ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
-        ps.addCommand('$res.content')
-        const str = await ps.invoke()
-        feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
-      }
+    //   const res = await client.get(feedUrl)
+    //   console.log('ntml url')
+    //   console.log(res)
+    //   console.log(res.data)
+    //   feed = await parser.parseString(res.data)
+    //   if(!feed.link){
+    const ps = new Shell({
+        executionPolicy: 'Bypass',
+        noProfile: true
+    })
+    ps.addCommand('chcp 65001')
+    ps.addCommand(`$secpasswd = ConvertTo-SecureString "${auth.pass}" -AsPlainText -Force`)
+    ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
+    ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
+    ps.addCommand('$res.content')
+    const str = await ps.invoke()
+    feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
+    //   }
     } else {
       const res = await axios(feedUrl)
-      console.log(res)
+    //   console.log(res)
       feed = await parser.parseString(res.data)
     }
     return ParseFeedPost({
@@ -81,77 +81,77 @@ export function ParseFeedPost (feed) {
   return feed
 }
 
-const client = axios.create({
-  httpsAgent,
-  agent: httpsAgent,
-  withCredentials: true,
-  shouldKeepAlive: true,
-  keepAlive: true,
-  keepAliveMsecs: 3000,
-  maxRedirects: 0,
-  'Access-Control-Allow-Origin': '*'
-})
+// const client = axios.create({
+//   httpsAgent,
+//   agent: httpsAgent,
+//   withCredentials: true,
+//   shouldKeepAlive: true,
+//   keepAlive: true,
+//   keepAliveMsecs: 3000,
+//   maxRedirects: 0,
+//   'Access-Control-Allow-Origin': '*'
+// })
 
-client.interceptors.response.use(
-  (response) => {
-    // IF DEV console.log('Response:', response);
-    return response
-  },
-  (err) => {
-    // IF DEV console.log('Response error:',err);
-    const error = err.response
-    console.log(err)
-    console.log(err.config)
-    // const options = new Options(err.config.url)
-    const url = err.config.url
-    console.log(url)
-    const auth = store.get('settings.auth')
-    const options = {
-      url: url,
-      domain: new URL(url).hostname,
-      username: auth.user,
-      password: auth.pass,
-      workstation: hostname()
-    }
-    console.log(options)
-    if (error.status === 401 && error.headers['www-authenticate'] && error.headers['www-authenticate'] === 'Negotiate, NTLM' && !err.config.headers['X-retry']) {
-      // TYPE 1 MESSAGE
-      return sendType1Message(options)
-    } else if (error.status === 401 && error.headers['www-authenticate'] && error.headers['www-authenticate'].substring(0, 4) === 'NTLM') {
-      // TYPE 2 MESSAGE PARSE ANS TYPE 3 MESSAGE SEND
-      return sendType3Message(error.headers['www-authenticate'], options)
-    }
-    return err
-  }
-)
+// client.interceptors.response.use(
+//   (response) => {
+//     // IF DEV console.log('Response:', response);
+//     return response
+//   },
+//   (err) => {
+//     // IF DEV console.log('Response error:',err);
+//     const error = err.response
+//     console.log(err)
+//     console.log(err.config)
+//     // const options = new Options(err.config.url)
+//     const url = err.config.url
+//     console.log(url)
+//     const auth = store.get('settings.auth')
+//     const options = {
+//       url: url,
+//       domain: new URL(url).hostname,
+//       username: auth.user,
+//       password: auth.pass,
+//       workstation: hostname()
+//     }
+//     console.log(options)
+//     if (error.status === 401 && error.headers['www-authenticate'] && error.headers['www-authenticate'] === 'Negotiate, NTLM' && !err.config.headers['X-retry']) {
+//       // TYPE 1 MESSAGE
+//       return sendType1Message(options)
+//     } else if (error.status === 401 && error.headers['www-authenticate'] && error.headers['www-authenticate'].substring(0, 4) === 'NTLM') {
+//       // TYPE 2 MESSAGE PARSE ANS TYPE 3 MESSAGE SEND
+//       return sendType3Message(error.headers['www-authenticate'], options)
+//     }
+//     return err
+//   }
+// )
 
-client.interceptors.request.use((request) => {
-  // IF DEV console.log('Starting Request', request);
-  return request
-})
+// client.interceptors.request.use((request) => {
+//   // IF DEV console.log('Starting Request', request);
+//   return request
+// })
 
-function sendType1Message (options) {
-  const type1msg = ntlm.createType1Message(options)
-  return client({
-    method: 'get',
-    url: options.url,
-    headers: {
-      Connection: 'keep-alive',
-      Authorization: type1msg
-    }
-  })
-}
+// function sendType1Message (options) {
+//   const type1msg = ntlm.createType1Message(options)
+//   return client({
+//     method: 'get',
+//     url: options.url,
+//     headers: {
+//       Connection: 'keep-alive',
+//       Authorization: type1msg
+//     }
+//   })
+// }
 
-function sendType3Message (token, options) {
-  const type2msg = ntlm.parseType2Message(token, (err) => { console.log(err) })
-  const type3msg = ntlm.createType3Message(type2msg, options)
-  return client({
-    method: 'get',
-    url: options.url,
-    headers: {
-      'X-retry': 'false',
-      Connection: 'Close',
-      Authorization: type3msg
-    }
-  })
-}
+// function sendType3Message (token, options) {
+//   const type2msg = ntlm.parseType2Message(token, (err) => { console.log(err) })
+//   const type3msg = ntlm.createType3Message(type2msg, options)
+//   return client({
+//     method: 'get',
+//     url: options.url,
+//     headers: {
+//       'X-retry': 'false',
+//       Connection: 'Close',
+//       Authorization: type3msg
+//     }
+//   })
+// }
