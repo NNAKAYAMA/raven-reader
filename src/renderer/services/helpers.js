@@ -99,7 +99,7 @@ export default {
       }
 
       if (feed.feedUrl) {
-        url = feed.feedUrl. || url
+        url = feed.feedUrl || url
 
       }
 
