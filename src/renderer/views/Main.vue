@@ -515,6 +515,7 @@ export default {
       data.date_published = data.date_published
         ? dayjs(data.date_published).format('MMMM D, YYYY')
         : null
+      data.title = data.title ? data.title : article.title
       data.favicon = article.favicon
       data.sitetitle = _.truncate(article.feed_title, 20)
       data.feed_id = article.feed_id
