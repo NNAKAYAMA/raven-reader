@@ -569,6 +569,8 @@ export default {
             self.prepareArticleData(data, article)
           } else if (!self.$store.state.Setting.offline && data) {
             self.prepareArticleData(data, article)
+          } else if (data === null) {
+            self.prepareArticleData(article, article)
           } else {
             console.log('EMPTY')
             article.content = null

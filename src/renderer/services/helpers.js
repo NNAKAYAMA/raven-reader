@@ -91,11 +91,11 @@ export default {
       let faviconUrl
 
       if (!importData) {
-        url = feed.url
+        url = feed.url || url
       }
 
       if (feed.xmlurl) {
-        url = feed.xmlurl
+        url = feed.xmlurl || url
       }
 
       if (feed.meta && feed.meta.xmlurl) {
