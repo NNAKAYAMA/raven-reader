@@ -507,7 +507,7 @@ export default {
     prepareArticleData (data, article) {
       const self = this
       self.empty = false
-      const $ = cheerio.load(data.content === null ? article.content : data.content)
+      const $ = cheerio.load(data.content ? data.content : article.content)
       $('a').addClass('js-external-link')
       $('img').addClass('img-fluid')
       $('iframe').parent().addClass('embed-responsive embed-responsive-16by9')
@@ -553,7 +553,6 @@ export default {
         self.loading = true
         db.fetchArticle(this.$route.params.id, async function (article) {
           let data
-          console.log(article)
           if (self.$store.state.Setting.offline) {
             data = await cacheService.getCachedArticleData(
               article._id,

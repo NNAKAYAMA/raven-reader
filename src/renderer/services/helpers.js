@@ -98,8 +98,12 @@ export default {
         url = feed.xmlurl
       }
 
-      if (feed.feedUrl) {
-        url = feed.feedUrl
+      if (feed.meta && feed.meta.xmlurl) {
+        url = feed.meta.xmlurl
+      }
+
+      if (feed.feed_url) {
+        url = feed.feed_url
       }
 
       const feeditem = await parseFeed(url, faviconUrl)
