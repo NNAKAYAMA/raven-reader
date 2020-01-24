@@ -104,12 +104,15 @@ export default {
   },
   addArticles (data, cb) {
     this.ensureIndex(article, 'guid')
-    return article.insert(data, (err, docs) => {
-      if (err) {
-        console.log(err)
-      }
-      return cb(docs)
+    let docs = []
+    data.forEach(f => {
+      article.insert(f, (err, doc) => {
+        if (!err) {
+          docs = [...docs, ...doc]
+        }
+      })
     })
+    return docs
   },
   updateArticleFeedTitle (id, title, category) {
     article.update({
