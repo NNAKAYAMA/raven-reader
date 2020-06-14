@@ -26,6 +26,7 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
       ps.addCommand('$res.content')
       const str = await ps.invoke()
       feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
+      ps.dispose()
     } else {
       const res = await axios(feedUrl)
       console.log(res)
