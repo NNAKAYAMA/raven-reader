@@ -11,7 +11,6 @@ const store = new Store()
  * @return array
  */
 export async function parseFeed (feedUrl, faviconUrl = null) {
-  try {
     let feed
     const auth = store.get('settings.auth')
     if (auth && feedUrl.match(/aspx$/)) {
@@ -24,9 +23,14 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
       ps.addCommand(`$cred = New-Object System.Management.Automation.PSCredential("${auth.user}", $secpasswd)`)
       ps.addCommand(`$res = Invoke-WebRequest -Uri "${feedUrl}" -Credential $cred`)
       ps.addCommand('$res.content')
-      const str = await ps.invoke()
-      feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
-      ps.dispose()
+      try {
+        const str = await ps.invoke()
+        feed = await parser.parseString(str.replace(/.*\r/, '').trimStart())
+      } catch (e) {
+        console.error(e)
+      } finally{
+        ps.dispose();
+      }
     } else {
       const res = await axios(feedUrl)
       console.log(res)
@@ -42,9 +46,6 @@ export async function parseFeed (feedUrl, faviconUrl = null) {
       },
       posts: feed.items
     })
-  } catch (e) {
-    console.error(e)
-  }
 }
 
 /**
